@@ -11,14 +11,32 @@ const User = sequelize.define(
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
+      // Example of get()..
+      get() {
+        const rawValue = this.getDataValue("firstName");
+        return rawValue ? rawValue.toUpperCase() : null;
+      },
     },
     lastName: {
       type: DataTypes.STRING,
       // allowNull defaults to true
+      set(value) {
+        // "Halum" will be added in everyone's last name :v
+        this.setDataValue("lastName", value + " halum");
+      },
     },
     age: {
       type: DataTypes.INTEGER,
       defaultValue: 23,
+    },
+    //Example of Virtual
+    fullName: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return `${this.getDataValue("firstName")} ${this.getDataValue(
+          "lastName"
+        )}`;
+      },
     },
   },
   {
