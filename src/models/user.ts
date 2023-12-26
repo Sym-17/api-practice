@@ -10,7 +10,13 @@ const User = sequelize.define(
 
     firstName: {
       type: DataTypes.STRING,
+      // Constraint
       allowNull: false,
+      // Validation
+      validate: {
+        isAlpha: true,
+        len: [2, 15],
+      },
       // Example of get()..
       get() {
         const rawValue = this.getDataValue("firstName");

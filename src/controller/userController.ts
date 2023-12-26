@@ -1,3 +1,4 @@
+import { ValidationError } from "sequelize";
 import User from "../models/user";
 import { Request, Response } from "express";
 
@@ -14,11 +15,23 @@ const addUser = async (
   //Shortcut
   // await User.create(req.body);
 
-  //For inserting bulk amount of data at a time
-  if (req.body.length > 1) await User.bulkCreate(req.body);
-  else await User.create(req.body);
+  try {
+    //For inserting bulk amount of data at a time
+    // By default validation is turned of in bulkCreate..You have to pass { validate: true } for turned on
+    if (req.body.length > 1)
+      await User.bulkCreate(req.body, { validate: true });
+    else await User.create(req.body);
 
-  res.send("Received!");
+    res.send("Received!");
+  } catch (err: any) {
+    // res.status(400).send(err);          // for showing the err object
+    switch (err.errors[0].errors.errors[0].validatorKey) {
+      case "isAlpha":
+        res.status(400).send("Only Alphabets are allowed!");
+      case "len":
+        res.status(400).send("Min lenth is 2 and max is 15!");
+    }
+  }
 };
 
 const getUsers = async (
